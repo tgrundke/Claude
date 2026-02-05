@@ -1,10 +1,16 @@
 "use client";
 
 import { useClients } from "@/hooks/use-clients";
+import { useLocalStorage } from "@/hooks/use-local-storage";
 import { PageHeader } from "@/components/layout/page-header";
 import { STAGE_ORDER, STAGE_LABELS, STAGE_COLORS } from "@/types/client";
+import { STORAGE_KEYS } from "@/lib/storage-keys";
+import { ENGINEERS } from "@/data/engineers";
+import type { DeploymentItem } from "@/types/deployment";
+import { TOOL_DISPLAY_NAMES, TOOL_COLORS } from "@/types/deployment";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
+import { format, parseISO, startOfWeek, addDays, isWithinInterval, isSameDay } from "date-fns";
 
 export default function DashboardPage() {
   const { clients, getClientsByStage } = useClients();
@@ -21,6 +27,43 @@ export default function DashboardPage() {
         }, 0) / clients.length
       )
     : 0;
+
+  // Gather all deployment items across clients for the timeline
+  const allDeployments: (DeploymentItem & { companyName: string })[] = [];
+  clients.forEach((client) => {
+    const key = `${STORAGE_KEYS.DEPLOYMENT_PREFIX}${client.id}`;
+    const stored = typeof window !== "undefined" ? localStorage.getItem(key) : null;
+    if (stored) {
+      try {
+        const items: DeploymentItem[] = JSON.parse(stored);
+        items.forEach((item) => {
+          allDeployments.push({ ...item, companyName: client.companyName });
+        });
+      } catch { /* ignore parse errors */ }
+    }
+  });
+
+  allDeployments.sort((a, b) => a.scheduledDate.localeCompare(b.scheduledDate));
+
+  // Build 4-week calendar view starting from today (Mon start)
+  const today = new Date();
+  const weekStart = startOfWeek(today, { weekStartsOn: 1 });
+  const calendarDays: Date[] = [];
+  for (let i = 0; i < 28; i++) {
+    calendarDays.push(addDays(weekStart, i));
+  }
+
+  // Engineer workload summary
+  const engineerWorkload = ENGINEERS.map((eng) => {
+    const assignedTasks = allDeployments.filter((d) => d.assignedTo === eng.name);
+    const todaySlot = eng.availability.find((s) => s.date === format(today, "yyyy-MM-dd"));
+    return {
+      ...eng,
+      totalTasks: assignedTasks.length,
+      completedTasks: assignedTasks.filter((t) => t.status === "completed").length,
+      freeHoursToday: todaySlot ? todaySlot.totalHours - todaySlot.bookedHours : 0,
+    };
+  });
 
   return (
     <div className="p-8">
@@ -57,6 +100,113 @@ export default function DashboardPage() {
         <div className="bg-white rounded-xl border border-gray-200 p-5">
           <p className="text-sm font-medium text-gray-500">Avg. Checklist Progress</p>
           <p className="text-3xl font-bold text-gray-900 mt-1">{avgChecklistProgress}%</p>
+        </div>
+      </div>
+
+      {/* Project Timeline Calendar */}
+      {allDeployments.length > 0 && (
+        <div className="bg-white rounded-xl border border-gray-200 p-6 mb-8">
+          <h2 className="text-lg font-semibold text-gray-900 mb-1">Project Timeline</h2>
+          <p className="text-xs text-gray-500 mb-4">4-week deployment view across all clients</p>
+
+          {/* Week headers */}
+          <div className="overflow-x-auto">
+            <div className="min-w-[700px]">
+              {/* Day headers */}
+              <div className="grid grid-cols-7 gap-px mb-1">
+                {["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"].map((d) => (
+                  <div key={d} className="text-center text-xs font-semibold text-gray-400 py-1">{d}</div>
+                ))}
+              </div>
+
+              {/* Calendar grid */}
+              <div className="grid grid-cols-7 gap-px bg-gray-200 rounded-lg overflow-hidden">
+                {calendarDays.map((day, idx) => {
+                  const dateStr = format(day, "yyyy-MM-dd");
+                  const dayTasks = allDeployments.filter((d) => d.scheduledDate === dateStr);
+                  const isToday = isSameDay(day, today);
+                  const isWeekend = day.getDay() === 0 || day.getDay() === 6;
+
+                  return (
+                    <div
+                      key={idx}
+                      className={cn(
+                        "bg-white p-1.5 min-h-[70px]",
+                        isToday && "ring-2 ring-blue-500 ring-inset",
+                        isWeekend && "bg-gray-50"
+                      )}
+                    >
+                      <p className={cn(
+                        "text-xs mb-1",
+                        isToday ? "font-bold text-blue-600" : "text-gray-400"
+                      )}>
+                        {format(day, "MMM d")}
+                      </p>
+                      {dayTasks.slice(0, 3).map((task) => (
+                        <div
+                          key={task.id}
+                          className={cn("text-xs px-1 py-0.5 rounded mb-0.5 truncate", TOOL_COLORS[task.tool])}
+                          title={`${task.companyName}: ${task.taskName} (${TOOL_DISPLAY_NAMES[task.tool]})`}
+                        >
+                          <span className="font-medium">{task.companyName.split(" ")[0]}</span>: {task.taskName.split(" - ").pop()}
+                        </div>
+                      ))}
+                      {dayTasks.length > 3 && (
+                        <p className="text-xs text-gray-400">+{dayTasks.length - 3} more</p>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+
+              {/* Legend */}
+              <div className="flex items-center gap-4 mt-3">
+                {(Object.entries(TOOL_DISPLAY_NAMES) as [string, string][]).map(([key, name]) => (
+                  <div key={key} className="flex items-center gap-1.5">
+                    <div className={cn("w-3 h-3 rounded", TOOL_COLORS[key as keyof typeof TOOL_COLORS])} />
+                    <span className="text-xs text-gray-500">{name}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Engineer Workload */}
+      <div className="bg-white rounded-xl border border-gray-200 p-6 mb-8">
+        <h2 className="text-lg font-semibold text-gray-900 mb-1">Engineering Team</h2>
+        <p className="text-xs text-gray-500 mb-4">Availability synced from Halo PSA / M365 Calendar</p>
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+          {engineerWorkload.map((eng) => (
+            <div key={eng.id} className="text-center p-4 rounded-xl border border-gray-100 hover:border-gray-300 hover:shadow-sm transition-all">
+              <div className={cn("w-12 h-12 rounded-full flex items-center justify-center text-white text-sm font-bold mx-auto mb-2", eng.color)}>
+                {eng.avatar}
+              </div>
+              <p className="text-sm font-medium text-gray-900">{eng.name}</p>
+              <p className="text-xs text-gray-400 mb-3">{eng.role}</p>
+              <div className="space-y-1">
+                <div className="flex items-center justify-between text-xs">
+                  <span className="text-gray-500">Today</span>
+                  <span className={cn("font-medium", eng.freeHoursToday > 4 ? "text-green-600" : eng.freeHoursToday > 0 ? "text-yellow-600" : "text-red-500")}>
+                    {eng.freeHoursToday}h free
+                  </span>
+                </div>
+                <div className="flex items-center justify-between text-xs">
+                  <span className="text-gray-500">Assigned</span>
+                  <span className="text-blue-600 font-medium">{eng.totalTasks} tasks</span>
+                </div>
+                {eng.totalTasks > 0 && (
+                  <div className="w-full bg-gray-200 rounded-full h-1.5 mt-1">
+                    <div
+                      className="bg-green-500 h-1.5 rounded-full"
+                      style={{ width: `${eng.totalTasks > 0 ? (eng.completedTasks / eng.totalTasks) * 100 : 0}%` }}
+                    />
+                  </div>
+                )}
+              </div>
+            </div>
+          ))}
         </div>
       </div>
 

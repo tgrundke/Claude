@@ -9,6 +9,7 @@ import { TOOL_DISPLAY_NAMES, TOOL_COLORS, DEPLOYMENT_STATUS_LABELS, DEPLOYMENT_S
 import type { DeploymentTool, DeploymentStatus, DeploymentItem } from "@/types/deployment";
 import { cn } from "@/lib/utils";
 import { format, parseISO, startOfWeek, addDays } from "date-fns";
+import { ENGINEERS, getAvailableEngineers } from "@/data/engineers";
 
 const inputCls = "w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent";
 const labelCls = "block text-sm font-medium text-gray-700 mb-1";
@@ -129,6 +130,36 @@ export default function DeploymentPage() {
         </div>
       </div>
 
+      {/* Engineer Availability */}
+      <div className="bg-white rounded-xl border border-gray-200 p-4 mb-6">
+        <h3 className="text-sm font-semibold text-gray-700 mb-3">Engineer Availability (from Halo PSA / M365 Calendar)</h3>
+        <div className="grid grid-cols-6 gap-3">
+          {ENGINEERS.map((eng) => {
+            const today = format(new Date(), "yyyy-MM-dd");
+            const todaySlot = eng.availability.find((s) => s.date === today);
+            const freeHours = todaySlot ? todaySlot.totalHours - todaySlot.bookedHours : 0;
+            const assignedTasks = items.filter((i) => i.assignedTo === eng.name).length;
+            return (
+              <div key={eng.id} className="text-center p-3 rounded-lg border border-gray-100 hover:border-gray-300 transition-colors">
+                <div className={cn("w-10 h-10 rounded-full flex items-center justify-center text-white text-xs font-bold mx-auto mb-2", eng.color)}>
+                  {eng.avatar}
+                </div>
+                <p className="text-xs font-medium text-gray-900 truncate">{eng.name}</p>
+                <p className="text-xs text-gray-400 truncate">{eng.role}</p>
+                <div className="mt-2 space-y-1">
+                  <p className={cn("text-xs font-medium", freeHours > 4 ? "text-green-600" : freeHours > 0 ? "text-yellow-600" : "text-red-500")}>
+                    {freeHours}h free today
+                  </p>
+                  {assignedTasks > 0 && (
+                    <p className="text-xs text-blue-600">{assignedTasks} task{assignedTasks > 1 ? "s" : ""} assigned</p>
+                  )}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+
       {/* Controls */}
       <div className="bg-white rounded-xl border border-gray-200 mb-6">
         <div className="p-4 border-b border-gray-200 flex items-center justify-between">
@@ -213,8 +244,18 @@ export default function DeploymentPage() {
                 </select>
               </div>
               <div>
-                <label className={labelCls}>Assigned To</label>
-                <input className={inputCls} value={form.assignedTo} onChange={(e) => setForm({ ...form, assignedTo: e.target.value })} placeholder="Team member name" />
+                <label className={labelCls}>Assign Engineer</label>
+                <select className={inputCls} value={form.assignedTo} onChange={(e) => setForm({ ...form, assignedTo: e.target.value })}>
+                  <option value="">-- Select Engineer --</option>
+                  {ENGINEERS.map((eng) => {
+                    const avail = form.scheduledDate ? getAvailableEngineers(form.scheduledDate).find((a) => a.id === eng.id) : null;
+                    return (
+                      <option key={eng.id} value={eng.name}>
+                        {eng.name} ({eng.role}){form.scheduledDate ? (avail ? " - Available" : " - Busy") : ""}
+                      </option>
+                    );
+                  })}
+                </select>
               </div>
               <div>
                 <label className={labelCls}>Notes</label>

@@ -14,6 +14,7 @@ const tabs = [
   { href: "/emails", label: "Emails" },
   { href: "/provisioning", label: "Provisioning" },
   { href: "/m365", label: "M365 Assessment" },
+  { href: "/review", label: "Review & Verify" },
 ];
 
 export default function ClientLayout({ children }: { children: React.ReactNode }) {

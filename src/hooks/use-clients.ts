@@ -59,6 +59,36 @@ export function useClients() {
     );
   };
 
+  const assignCategoryToEngineer = (clientId: string, category: string, engineerName: string) => {
+    setClients((prev) =>
+      prev.map((c) => {
+        if (c.id !== clientId) return c;
+        return {
+          ...c,
+          checklist: c.checklist.map((item) =>
+            item.category === category ? { ...item, assignedTo: engineerName } : item
+          ),
+          updatedAt: new Date().toISOString(),
+        };
+      })
+    );
+  };
+
+  const scheduleCategoryTasks = (clientId: string, category: string, scheduledDate: string, dueDate: string) => {
+    setClients((prev) =>
+      prev.map((c) => {
+        if (c.id !== clientId) return c;
+        return {
+          ...c,
+          checklist: c.checklist.map((item) =>
+            item.category === category ? { ...item, scheduledDate, dueDate } : item
+          ),
+          updatedAt: new Date().toISOString(),
+        };
+      })
+    );
+  };
+
   return {
     clients,
     addClient,
@@ -68,5 +98,7 @@ export function useClients() {
     getClientsByStage,
     moveClientToStage,
     updateChecklist,
+    assignCategoryToEngineer,
+    scheduleCategoryTasks,
   };
 }

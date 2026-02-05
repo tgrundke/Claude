@@ -1,0 +1,193 @@
+import type { HuduConfigType, HuduRequiredField, HuduExpectedConfig } from "@/types/hudu";
+
+// Fields required for each Hudu configuration type
+export const HUDU_REQUIRED_FIELDS: Record<HuduConfigType, HuduRequiredField[]> = {
+  client_profile: [
+    { fieldName: "company_name", label: "Company Name", required: true },
+    { fieldName: "primary_contact", label: "Primary Contact", required: true },
+    { fieldName: "primary_email", label: "Primary Email", required: true },
+    { fieldName: "primary_phone", label: "Primary Phone", required: true },
+    { fieldName: "address", label: "Address", required: true },
+    { fieldName: "website", label: "Website", required: false },
+    { fieldName: "industry", label: "Industry", required: false },
+    { fieldName: "employee_count", label: "Employee Count", required: true },
+    { fieldName: "sla_tier", label: "SLA Tier", required: true },
+    { fieldName: "contract_start", label: "Contract Start Date", required: true },
+    { fieldName: "contract_value", label: "Monthly Contract Value", required: true },
+    { fieldName: "billing_contact", label: "Billing Contact", required: true },
+    { fieldName: "emergency_contact", label: "Emergency Contact", required: true },
+  ],
+  microsoft_365: [
+    { fieldName: "tenant_name", label: "Tenant Name", required: true },
+    { fieldName: "tenant_id", label: "Tenant ID", required: true },
+    { fieldName: "primary_domain", label: "Primary Domain", required: true },
+    { fieldName: "admin_url", label: "Admin Portal URL", required: true },
+    { fieldName: "global_admin", label: "Global Admin Account", required: true },
+    { fieldName: "license_summary", label: "License Summary", required: true },
+    { fieldName: "user_count", label: "User Count", required: true },
+    { fieldName: "mfa_status", label: "MFA Status", required: true },
+    { fieldName: "conditional_access", label: "Conditional Access Policies", required: true },
+    { fieldName: "backup_solution", label: "M365 Backup Solution", required: false },
+    { fieldName: "retention_policies", label: "Retention Policies", required: false },
+    { fieldName: "dkim_dmarc", label: "DKIM/DMARC Configuration", required: true },
+  ],
+  vpn_configuration: [
+    { fieldName: "vpn_type", label: "VPN Type (Site-to-Site / Client)", required: true },
+    { fieldName: "vpn_gateway", label: "VPN Gateway / Endpoint", required: true },
+    { fieldName: "authentication", label: "Authentication Method", required: true },
+    { fieldName: "encryption", label: "Encryption Protocol", required: true },
+    { fieldName: "remote_subnets", label: "Remote Subnets", required: true },
+    { fieldName: "local_subnets", label: "Local Subnets", required: true },
+    { fieldName: "psk_or_cert", label: "PSK / Certificate Details", required: true },
+    { fieldName: "connected_sites", label: "Connected Sites", required: false },
+  ],
+  firewall_configuration: [
+    { fieldName: "make_model", label: "Make / Model", required: true },
+    { fieldName: "serial_number", label: "Serial Number", required: true },
+    { fieldName: "firmware_version", label: "Firmware Version", required: true },
+    { fieldName: "management_ip", label: "Management IP", required: true },
+    { fieldName: "wan_ip", label: "WAN IP", required: true },
+    { fieldName: "lan_subnets", label: "LAN Subnets", required: true },
+    { fieldName: "nat_rules", label: "NAT Rules", required: false },
+    { fieldName: "firewall_rules", label: "Firewall Rules Summary", required: true },
+    { fieldName: "vpn_config", label: "VPN Configuration", required: false },
+    { fieldName: "admin_credentials", label: "Admin Credentials (in password manager)", required: true },
+    { fieldName: "location", label: "Physical Location", required: true },
+    { fieldName: "support_contract", label: "Support Contract / Warranty", required: false },
+  ],
+  server_configuration: [
+    { fieldName: "hostname", label: "Hostname", required: true },
+    { fieldName: "role", label: "Server Role", required: true },
+    { fieldName: "os_version", label: "OS Version", required: true },
+    { fieldName: "ip_address", label: "IP Address", required: true },
+    { fieldName: "cpu_ram", label: "CPU / RAM", required: true },
+    { fieldName: "storage", label: "Storage Configuration", required: true },
+    { fieldName: "virtual_physical", label: "Virtual or Physical", required: true },
+    { fieldName: "hypervisor", label: "Hypervisor (if virtual)", required: false },
+    { fieldName: "backup_config", label: "Backup Configuration", required: true },
+    { fieldName: "applications", label: "Installed Applications", required: true },
+    { fieldName: "admin_credentials", label: "Admin Credentials", required: true },
+    { fieldName: "location", label: "Physical Location", required: true },
+    { fieldName: "warranty", label: "Warranty / Support", required: false },
+  ],
+  network_switch_configuration: [
+    { fieldName: "make_model", label: "Make / Model", required: true },
+    { fieldName: "serial_number", label: "Serial Number", required: true },
+    { fieldName: "management_ip", label: "Management IP", required: true },
+    { fieldName: "port_count", label: "Port Count", required: true },
+    { fieldName: "poe_capable", label: "PoE Capable", required: true },
+    { fieldName: "vlan_config", label: "VLAN Configuration", required: true },
+    { fieldName: "uplink_ports", label: "Uplink Ports", required: false },
+    { fieldName: "admin_credentials", label: "Admin Credentials", required: true },
+    { fieldName: "location", label: "Physical Location", required: true },
+  ],
+  backup_configuration: [
+    { fieldName: "solution", label: "Backup Solution (Axcient)", required: true },
+    { fieldName: "appliance_info", label: "Appliance / Cloud Info", required: true },
+    { fieldName: "protected_systems", label: "Protected Systems", required: true },
+    { fieldName: "backup_schedule", label: "Backup Schedule", required: true },
+    { fieldName: "retention_policy", label: "Retention Policy", required: true },
+    { fieldName: "last_test_restore", label: "Last Test Restore", required: true },
+    { fieldName: "offsite_replication", label: "Offsite Replication Status", required: true },
+    { fieldName: "rto_rpo", label: "RTO / RPO Targets", required: true },
+    { fieldName: "admin_portal", label: "Admin Portal URL", required: true },
+  ],
+  wireless_configuration: [
+    { fieldName: "controller", label: "Wireless Controller", required: false },
+    { fieldName: "access_points", label: "Access Points (count & model)", required: true },
+    { fieldName: "ssids", label: "SSIDs", required: true },
+    { fieldName: "security_type", label: "Security Type (WPA2/WPA3)", required: true },
+    { fieldName: "vlan_assignment", label: "VLAN Assignment per SSID", required: true },
+    { fieldName: "guest_network", label: "Guest Network Config", required: false },
+    { fieldName: "credentials", label: "Wireless Credentials", required: true },
+  ],
+  domain_dns: [
+    { fieldName: "domain_names", label: "Domain Names", required: true },
+    { fieldName: "registrar", label: "Domain Registrar", required: true },
+    { fieldName: "dns_hosting", label: "DNS Hosting Provider", required: true },
+    { fieldName: "mx_records", label: "MX Records", required: true },
+    { fieldName: "spf_record", label: "SPF Record", required: true },
+    { fieldName: "dkim_config", label: "DKIM Configuration", required: true },
+    { fieldName: "dmarc_record", label: "DMARC Record", required: true },
+    { fieldName: "key_dns_records", label: "Key DNS Records (A, CNAME, etc.)", required: true },
+    { fieldName: "ssl_certificates", label: "SSL Certificates", required: false },
+  ],
+  isp_circuit: [
+    { fieldName: "provider", label: "ISP Provider", required: true },
+    { fieldName: "circuit_id", label: "Circuit ID", required: true },
+    { fieldName: "bandwidth", label: "Bandwidth (Up/Down)", required: true },
+    { fieldName: "circuit_type", label: "Circuit Type (Fiber, Cable, etc.)", required: true },
+    { fieldName: "wan_ip", label: "WAN IP / Subnet", required: true },
+    { fieldName: "gateway", label: "Gateway", required: true },
+    { fieldName: "support_phone", label: "Support Phone", required: true },
+    { fieldName: "account_number", label: "Account Number", required: true },
+    { fieldName: "sla", label: "SLA / Uptime Guarantee", required: false },
+  ],
+  printer_scanner: [
+    { fieldName: "make_model", label: "Make / Model", required: true },
+    { fieldName: "serial_number", label: "Serial Number", required: true },
+    { fieldName: "ip_address", label: "IP Address", required: true },
+    { fieldName: "location", label: "Physical Location", required: true },
+    { fieldName: "print_driver", label: "Print Driver", required: false },
+    { fieldName: "scan_config", label: "Scan-to Configuration", required: false },
+    { fieldName: "supply_vendor", label: "Supply Vendor", required: false },
+  ],
+  voip_configuration: [
+    { fieldName: "provider", label: "VoIP Provider", required: true },
+    { fieldName: "system_type", label: "System Type (Cloud/On-Prem)", required: true },
+    { fieldName: "admin_portal", label: "Admin Portal URL", required: true },
+    { fieldName: "phone_count", label: "Phone Count", required: true },
+    { fieldName: "main_number", label: "Main Number", required: true },
+    { fieldName: "auto_attendant", label: "Auto Attendant Config", required: false },
+    { fieldName: "call_routing", label: "Call Routing / Ring Groups", required: false },
+    { fieldName: "admin_credentials", label: "Admin Credentials", required: true },
+  ],
+  security_solution: [
+    { fieldName: "solution_name", label: "Solution Name (Sophos MDR)", required: true },
+    { fieldName: "tenant_id", label: "Tenant / Account ID", required: true },
+    { fieldName: "admin_portal", label: "Admin Portal URL", required: true },
+    { fieldName: "endpoint_count", label: "Protected Endpoint Count", required: true },
+    { fieldName: "policy_config", label: "Policy Configuration", required: true },
+    { fieldName: "exclusions", label: "Exclusions", required: false },
+    { fieldName: "mdr_contact", label: "MDR Contact / Escalation", required: true },
+    { fieldName: "alert_recipients", label: "Alert Recipients", required: true },
+  ],
+  physical_location: [
+    { fieldName: "location_name", label: "Location Name", required: true },
+    { fieldName: "address", label: "Address", required: true },
+    { fieldName: "main_phone", label: "Main Phone", required: true },
+    { fieldName: "site_contact", label: "Site Contact", required: true },
+    { fieldName: "access_instructions", label: "Access Instructions", required: false },
+    { fieldName: "server_room", label: "Server Room / MDF Location", required: false },
+    { fieldName: "idf_locations", label: "IDF Locations", required: false },
+    { fieldName: "alarm_code", label: "Alarm Code / Access Code", required: false },
+    { fieldName: "wifi_password", label: "WiFi Password (location)", required: false },
+  ],
+};
+
+// Standard configurations that ALWAYS must exist in Hudu, regardless of environment
+export const ALWAYS_REQUIRED_CONFIGS: HuduConfigType[] = [
+  "client_profile",
+  "microsoft_365",
+  "domain_dns",
+  "backup_configuration",
+  "security_solution",
+];
+
+// Configs derived from environment data
+export interface EnvironmentDerivedExpectation {
+  configType: HuduConfigType;
+  countSource: "firewalls" | "servers" | "workstations" | "switches" | "assets" | "locations";
+  label: string;
+}
+
+export const ENVIRONMENT_DERIVED_CONFIGS: EnvironmentDerivedExpectation[] = [
+  { configType: "firewall_configuration", countSource: "firewalls", label: "Firewall Configurations" },
+  { configType: "server_configuration", countSource: "servers", label: "Server Configurations" },
+  { configType: "network_switch_configuration", countSource: "switches", label: "Network Switch Configurations" },
+  { configType: "physical_location", countSource: "locations", label: "Physical Location Docs" },
+];
+
+export function getRequiredFieldsForType(type: HuduConfigType): HuduRequiredField[] {
+  return HUDU_REQUIRED_FIELDS[type] || [];
+}

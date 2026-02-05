@@ -43,6 +43,10 @@ export function getDefaultChecklist(): ChecklistItem[] {
     completed: false,
     completedAt: null,
     completedBy: null,
+    assignedTo: "",
+    scheduledDate: "",
+    dueDate: "",
+    priority: "medium" as const,
     notes: "",
     order: index,
   }));

@@ -96,6 +96,10 @@ export interface ChecklistItem {
   completed: boolean;
   completedAt: string | null;
   completedBy: string | null;
+  assignedTo: string;
+  scheduledDate: string;
+  dueDate: string;
+  priority: "low" | "medium" | "high";
   notes: string;
   order: number;
 }

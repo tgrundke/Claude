@@ -1,5 +1,5 @@
 export type OnboardingStage =
-  | "new_lead"
+  | "intake"
   | "discovery"
   | "environment_documentation"
   | "deployment_planning"
@@ -9,7 +9,7 @@ export type OnboardingStage =
   | "complete";
 
 export const STAGE_LABELS: Record<OnboardingStage, string> = {
-  new_lead: "New Lead",
+  intake: "Intake (from HubSpot)",
   discovery: "Discovery",
   environment_documentation: "Environment Documentation",
   deployment_planning: "Deployment Planning",
@@ -20,7 +20,7 @@ export const STAGE_LABELS: Record<OnboardingStage, string> = {
 };
 
 export const STAGE_COLORS: Record<OnboardingStage, string> = {
-  new_lead: "bg-blue-100 text-blue-800",
+  intake: "bg-blue-100 text-blue-800",
   discovery: "bg-purple-100 text-purple-800",
   environment_documentation: "bg-yellow-100 text-yellow-800",
   deployment_planning: "bg-orange-100 text-orange-800",
@@ -31,7 +31,7 @@ export const STAGE_COLORS: Record<OnboardingStage, string> = {
 };
 
 export const STAGE_ORDER: OnboardingStage[] = [
-  "new_lead",
+  "intake",
   "discovery",
   "environment_documentation",
   "deployment_planning",

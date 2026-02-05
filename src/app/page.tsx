@@ -127,7 +127,7 @@ export default function DashboardPage() {
             <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" /><circle cx="9" cy="7" r="4" /><line x1="19" x2="19" y1="8" y2="14" /><line x1="22" x2="16" y1="11" y2="11" />
           </svg>
           <h3 className="mt-4 text-lg font-medium text-gray-900">No clients yet</h3>
-          <p className="mt-2 text-sm text-gray-500">Get started by adding your first client or importing from your CRM.</p>
+          <p className="mt-2 text-sm text-gray-500">Get started by adding your first client or importing from HubSpot / your outgoing provider&apos;s PSA.</p>
           <div className="mt-6 flex justify-center gap-3">
             <Link
               href="/clients/new"
@@ -139,7 +139,7 @@ export default function DashboardPage() {
               href="/import"
               className="inline-flex items-center px-4 py-2 bg-white text-gray-700 text-sm font-medium rounded-lg border border-gray-300 hover:bg-gray-50"
             >
-              Import from CRM
+              Import from PSA
             </Link>
           </div>
         </div>

@@ -142,7 +142,7 @@ export default function ImportPage() {
     <div className="p-8 max-w-4xl mx-auto">
       <PageHeader
         title="Import Data"
-        description="Import client data from ConnectWise, Halo, or other CRM/PSA systems"
+        description="Import client data from the outgoing provider's PSA (ConnectWise, Halo, etc.) — client records come from HubSpot"
       />
 
       {/* Step Indicator */}

@@ -14,7 +14,7 @@ export function useClients() {
     const newClient: Client = {
       ...data,
       id: generateId(),
-      stage: "new_lead",
+      stage: "intake",
       checklist: getDefaultChecklist(),
       createdAt: now,
       updatedAt: now,

@@ -105,6 +105,46 @@ export function useEnvironment(clientId: string) {
     setData((prev) => ({ ...prev, assets: prev.assets.filter((a) => a.id !== id) }));
   };
 
+  // Bulk import methods for Auvik/Ninja integrations
+  const bulkAddFirewalls = (items: Omit<Firewall, "id" | "clientId">[]) => {
+    setData((prev) => ({
+      ...prev,
+      firewalls: [...prev.firewalls, ...items.map((fw) => ({ ...fw, id: generateId(), clientId }))],
+    }));
+  };
+
+  const bulkAddServers = (items: Omit<Server, "id" | "clientId">[]) => {
+    setData((prev) => ({
+      ...prev,
+      servers: [...prev.servers, ...items.map((s) => ({ ...s, id: generateId(), clientId }))],
+    }));
+  };
+
+  const bulkAddWorkstations = (items: Omit<Workstation, "id" | "clientId">[]) => {
+    setData((prev) => ({
+      ...prev,
+      workstations: [...prev.workstations, ...items.map((w) => ({ ...w, id: generateId(), clientId }))],
+    }));
+  };
+
+  const bulkAddSwitches = (items: Omit<NetworkSwitch, "id" | "clientId">[]) => {
+    setData((prev) => ({
+      ...prev,
+      switches: [...prev.switches, ...items.map((sw) => ({ ...sw, id: generateId(), clientId }))],
+    }));
+  };
+
+  const bulkAddAssets = (items: Omit<GenericAsset, "id" | "clientId">[]) => {
+    setData((prev) => ({
+      ...prev,
+      assets: [...prev.assets, ...items.map((a) => ({ ...a, id: generateId(), clientId }))],
+    }));
+  };
+
+  const clearAll = () => {
+    setData(emptyEnv);
+  };
+
   return {
     ...data,
     addFirewall, updateFirewall, deleteFirewall,
@@ -112,5 +152,7 @@ export function useEnvironment(clientId: string) {
     addWorkstation, updateWorkstation, deleteWorkstation,
     addSwitch, updateSwitch, deleteSwitch,
     addAsset, updateAsset, deleteAsset,
+    bulkAddFirewalls, bulkAddServers, bulkAddWorkstations, bulkAddSwitches, bulkAddAssets,
+    clearAll,
   };
 }
